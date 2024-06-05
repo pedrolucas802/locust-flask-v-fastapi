@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+  fastapi:
+    build: ./fastapi_app
+    ports:
+      - "8001:8000" 
+    networks:
+      - backend
+
+  flask:
+    build: ./flask_app
+    ports:
+      - "5001:5000"  
+    networks:
+      - backend
+
+  locust:
+    image: locustio/locust
+    volumes:
+      - ./locust:/mnt/locust
+    ports:
+      - "8089:8089"
+    command: -f /mnt/locust/locustfile.py --host=http://fastapi:8000/
+    depends_on:
+      - fastapi
+      - flask
+    networks:
+      - backend
+
+networks:
+  backend:
